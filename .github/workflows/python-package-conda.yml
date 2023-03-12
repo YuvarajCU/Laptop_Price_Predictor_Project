@@ -23,7 +23,7 @@ jobs:
         exec bash
     - name: Create Conda environment
       run: |
-        conda env create --file environment.yml
+        conda env update --file environment.yml --name env_name
         conda activate my_env
   # Add additional steps to build and deploy your Streamlit app
 
