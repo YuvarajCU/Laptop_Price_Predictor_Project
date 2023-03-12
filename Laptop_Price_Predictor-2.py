@@ -4,8 +4,8 @@
 # In[1]:
 
 
-get_ipython().system('pip install jedi')
-get_ipython().system('pip install streamlit')
+!pip install jedi
+!pip install streamlit
 
 
 # In[3]:
