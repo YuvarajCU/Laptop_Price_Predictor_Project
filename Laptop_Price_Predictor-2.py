@@ -1,23 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-!pip install streamlit
-
-
-# In[3]:
-
-
 import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
+
 #load the model and dataframe
 df = pd.read_csv("df.csv")
 pipe = pickle.load(open("pipe.pkl", "rb"))
 st.title("Laptop Price Predictor")
+
 #Now we will take user input one by one as per our dataframe
 #Brand
 #company = st.selectbox('Brand', df['Company'].unique())
@@ -60,10 +53,3 @@ if st.button('Predict Price'):
     query = query.reshape(1, 12)
     prediction = str(int(np.exp(pipe.predict(query)[0])))
     st.title("The predicted price of this configuration is " + prediction)
-
-
-# In[ ]:
-
-
-
-
