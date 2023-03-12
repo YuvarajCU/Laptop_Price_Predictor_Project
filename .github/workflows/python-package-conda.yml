@@ -19,9 +19,10 @@ jobs:
     - name: Create conda environment
       run: |
         conda create --name my_env python=3.10
-    - name: Activate conda environment
+    - name: Initialize conda
       run: |
         conda init bash
+        exec bash
         conda activate my_env
     - name: Install dependencies
       run: |
