@@ -408,7 +408,7 @@ X = df[['Company']]
 y = df['Price_euros']
 
 # one-hot encode the categorical variable
-ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [0])])
+ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [0])],remainder='pasthrough')
 X = ct.fit_transform(X)
 
 # split the data into training and testing sets
