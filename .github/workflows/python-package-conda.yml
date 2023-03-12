@@ -31,7 +31,7 @@ jobs:
   # Add additional steps to build and deploy your Streamlit app
     - name: Install Flake8
       run: |
-        conda install -c conda-forge flake8
+        python -m pip install flake8
     - name: Run Flake8
       run: |
         flake8 --exclude=venv
