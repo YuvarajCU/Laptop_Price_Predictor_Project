@@ -108,7 +108,7 @@ sns.barplot(x=df['Touchscreen'], y=df['Price_euros'])
 
 # extract IPS column
 df['Ips'] = df['ScreenResolution'].apply(
-    lambda x:1 if 'IPS' in x else 0
+    lambda x : 1 if 'IPS' in x else 0
 )
 sns.barplot(x=df['Ips'], y=df['Price_euros'])
 
@@ -118,11 +118,11 @@ sns.barplot(x=df['Ips'], y=df['Price_euros'])
 
 def findXresolution(s):
     return s.split()[-1].split("x")[0]
-  
-  
+
+
 def findYresolution(s):
     return s.split()[-1].split("x")[1]
-  
+
 
 # finding the x_res and y_res from screen resolution
 df['X_res'] = df['ScreenResolution'].apply(lambda x: findXresolution(x))
@@ -134,8 +134,9 @@ df['Y_res'] = df['Y_res'].astype('int')
 
 # Replacing inches, X and Y resolution to PPI
 df['ppi'] = (((df['X_res']**2) + (df['Y_res']**2))**0.5 /
-              df['Inches']).astype('float')
+             df['Inches']).astype('float')
 df.corr()['Price_euros'].sort_values(ascending=False)
+
 df.drop(columns=['ScreenResolution', 'Inches', 'X_res', 'Y_res'],
         inplace=True)
 
@@ -144,7 +145,7 @@ df.drop(columns=['ScreenResolution', 'Inches', 'X_res', 'Y_res'],
 
 
 df['ppi'] = np.log(df['ppi'])
-sns.pairplot(df, x_vars=['ppi'], y_vars=['Price_euros'], 
+sns.pairplot(df, x_vars=['ppi'], y_vars=['Price_euros'],
              kind='scatter', height=5, aspect=1.5)
 
 
