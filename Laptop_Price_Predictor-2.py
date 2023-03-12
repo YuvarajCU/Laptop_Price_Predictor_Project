@@ -4,7 +4,6 @@
 # In[1]:
 
 
-!pip install jedi
 !pip install streamlit
 
 
