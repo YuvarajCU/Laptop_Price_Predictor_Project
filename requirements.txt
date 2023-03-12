@@ -1,4 +1,9 @@
-streamlit
-scikit-learn
-numpy
-pandas
+name: my_env
+channels:
+  - defaults
+dependencies:
+  - python=3.10.5
+  - scikit-learn
+  - streamlit
+  - numpy
+  - pandas
