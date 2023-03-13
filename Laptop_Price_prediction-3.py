@@ -415,11 +415,6 @@ vif["VIF"] = [variance_inflation_factor(X.values, i)
 # display the VIF values
 print(vif)
 
-
-# In[91]:
-
-
-
 X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips",
         "ppi", "SSD", "HDD"]]
 y = df["Price_euros"]
@@ -429,25 +424,18 @@ model = sm.OLS(y, X).fit()
 print(model.summary())
 
 
-# In[92]:
-
-
 X = X.drop(columns=["Ram", "Weight", "Price_euros", "const"])
 # calculate the VIF for each variable
 vif = pd.DataFrame()
 vif["features"] = X.columns
 vif["VIF"] = [variance_inflation_factor(X.values, i)
               for i in range(X.shape[1])]
-
 # display the VIF values
 print(vif)
-
-
 
 X = df[["Touchscreen", "Ips", "ppi", "SSD", "HDD"]]
 y = df["Price_euros"]
 model = sm.OLS(y, X).fit()
-
 print(model.summary())
 
 
