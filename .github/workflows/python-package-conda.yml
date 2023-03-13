@@ -37,7 +37,7 @@ jobs:
         flake8 --exclude=venv
     - name: Install pytest
       run: |
-        conda install -c conda-forge pytest
+        conda install -c anaconda pytest
     - name: Run tests
       run: |
         pytest
