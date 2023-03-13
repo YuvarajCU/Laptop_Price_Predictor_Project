@@ -420,8 +420,8 @@ print(vif)
 
 
 
-X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips", "ppi",
-        "SSD", "HDD"]]
+X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips",
+        "ppi", "SSD", "HDD"]]
 y = df["Price_euros"]
 X = sm.add_constant(X)
 model = sm.OLS(y, X).fit()
