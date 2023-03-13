@@ -1,10 +1,6 @@
-name: my_env
-channels:
-  - defaults
-dependencies:
-  - python=3.10.5
-  - scikit-learn
-  - streamlit
-  - numpy
-  - pandas
-  -pytest
+python=3.10.5
+scikit-learn
+streamlit
+numpy
+pandas
+pytest
