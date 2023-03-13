@@ -10,6 +10,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import statsmodels.api as sm
+from statsmodels.stats.outliers_influence \
+    import variance_inflation_factor
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics \
+    import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LinearRegression
+
 
 path = "Dataset.csv"
 df = pd.read_csv(path, encoding="latin-1")
@@ -81,7 +93,8 @@ df["Weight"] = df["Weight"].str.extract(r"(\d+(?:\.\d+)?)").astype(float)
 df["Weight"] = np.log(df["Weight"])
 
 sns.pairplot(
-    df, x_vars=["Weight"], y_vars=["Price_euros"], kind="scatter", height=5, aspect=1.5
+    df, x_vars=["Weight"], y_vars=["Price_euros"], kind="scatter",
+    height=5, aspect=1.5
 )
 plt.show()
 
@@ -132,12 +145,14 @@ df["X_res"] = df["X_res"].astype("int")
 df["Y_res"] = df["Y_res"].astype("int")
 
 # Replacing inches, X and Y resolution to PPI
-df["ppi"] = (((df["X_res"] ** 2) + (df["Y_res"] ** 2)) ** 0.5 / df["Inches"]).astype(
+df["ppi"] = (((df["X_res"] ** 2) +
+              (df["Y_res"] ** 2)) ** 0.5 / df["Inches"]).astype(
     "float"
 )
 df.corr()["Price_euros"].sort_values(ascending=False)
 
-df.drop(columns=["ScreenResolution", "Inches", "X_res", "Y_res"], inplace=True)
+df.drop(columns=["ScreenResolution", "Inches", "X_res", "Y_res"],
+        inplace=True)
 
 
 # In[78]:
@@ -145,7 +160,8 @@ df.drop(columns=["ScreenResolution", "Inches", "X_res", "Y_res"], inplace=True)
 
 df["ppi"] = np.log(df["ppi"])
 sns.pairplot(
-    df, x_vars=["ppi"], y_vars=["Price_euros"], kind="scatter", height=5, aspect=1.5
+    df, x_vars=["ppi"], y_vars=["Price_euros"], kind="scatter",
+    height=5, aspect=1.5
 )
 
 
@@ -216,12 +232,15 @@ df["second"] = df["second"].str.replace(r"\D", "", regex=True)
 df["first"] = df["first"].astype(int)
 df["second"] = df["second"].astype(int)
 
-df["HDD"] = df["first"] * df["Layer1HDD"] + df["second"] * df["Layer2HDD"]
-df["SSD"] = df["first"] * df["Layer1SSD"] + df["second"] * df["Layer2SSD"]
-df["Hybrid"] = df["first"] * df["Layer1Hybrid"] + df["second"] * df["Layer2Hybrid"]
-df["Flash_Storage"] = (
-    df["first"] * df["Layer1Flash_Storage"] + df["second"] * df["Layer2Flash_Storage"]
-)
+df["HDD"] = (df["first"] * df["Layer1HDD"] +
+             df["second"] * df["Layer2HDD"])
+df["SSD"] = (df["first"] * df["Layer1SSD"] +
+             df["second"] * df["Layer2SSD"])
+df["Hybrid"] = (df["first"] * df["Layer1Hybrid"] +
+                df["second"] * df["Layer2Hybrid"])
+df["Flash_Storage"] = (df["first"] * df["Layer1Flash_Storage"] +
+                       df["second"] * df["Layer2Flash_Storage"])
+
 
 df.drop(
     columns=[
@@ -366,9 +385,6 @@ df.sample(3)
 
 # In[89]:
 
-
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-
 corr = df.corr()
 print(corr)
 
@@ -393,7 +409,8 @@ X = df[
 # calculate the VIF for each variable
 vif = pd.DataFrame()
 vif["features"] = X.columns
-vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+vif["VIF"] = [variance_inflation_factor(X.values, i)
+              for i in range(X.shape[1])]
 
 # display the VIF values
 print(vif)
@@ -404,7 +421,8 @@ print(vif)
 
 import statsmodels.api as sm
 
-X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips", "ppi", "SSD", "HDD"]]
+X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips", "ppi",
+        "SSD", "HDD"]]
 y = df["Price_euros"]
 X = sm.add_constant(X)
 model = sm.OLS(y, X).fit()
@@ -419,16 +437,13 @@ X = X.drop(columns=["Ram", "Weight", "Price_euros", "const"])
 # calculate the VIF for each variable
 vif = pd.DataFrame()
 vif["features"] = X.columns
-vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+vif["VIF"] = [variance_inflation_factor(X.values, i)
+              for i in range(X.shape[1])]
 
 # display the VIF values
 print(vif)
 
 
-# In[93]:
-
-
-import statsmodels.api as sm
 
 X = df[["Touchscreen", "Ips", "ppi", "SSD", "HDD"]]
 y = df["Price_euros"]
@@ -438,21 +453,6 @@ print(model.summary())
 
 
 # ##Models
-
-# In[94]:
-
-
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-from sklearn.model_selection import cross_val_score
-from sklearn.linear_model import LinearRegression
-
-
-# In[95]:
-
 
 df.head()
 
@@ -469,7 +469,8 @@ y = df["Price_euros"]
 
 # one-hot encode the categorical variable
 ct = ColumnTransformer(
-    transformers=[("encoder", OneHotEncoder(), [0])], remainder="pasthrough"
+    transformers=[("encoder", OneHotEncoder(), [0])],
+    remainder="pasthrough"
 )
 X = ct.fit_transform(X)
 
@@ -485,12 +486,14 @@ regressor.fit(X_train, y_train)
 # make predictions on the test data
 y_pred = regressor.predict(X_test)
 
-accuracies = cross_val_score(estimator=regressor, X=X_train, y=y_train, cv=5)
+accuracies = cross_val_score(estimator=regressor,
+                             X=X_train, y=y_train, cv=5)
 
 print(f"R2 Score : {r2_score(y_test, y_pred)*100:.2f}%")
 print(f"MAE : {mean_absolute_error(y_test, y_pred)*100:.2f}%")
 print(f"MSE : {mean_squared_error(y_test, y_pred)*100:.2f}%")
-print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean() * 100))
+print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean()
+                                            * 100))
 
 model_comparison = {}
 model_comparison["SLR Vs Company"] = [
@@ -510,7 +513,8 @@ model_comparison["SLR Vs Company"] = [
 X = df["Ram"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to fit an intercept
+# Add a constant term to the predictor variable to fit 
+# an intercept
 X = sm.add_constant(X)
 
 # Fit the linear regression model
@@ -530,12 +534,14 @@ from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
-accuracies = cross_val_score(estimator=model, X=X_train, y=y_train, cv=5)
+accuracies = cross_val_score(estimator=model, X=X_train,
+                             y=y_train, cv=5)
 
 print(f"R2 Score : {r2_score(y_test, y_pred)*100:.2f}%")
 print(f"MAE : {mean_absolute_error(y_test, y_pred)*100:.2f}%")
 print(f"MSE : {mean_squared_error(y_test, y_pred)*100:.2f}%")
-print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean() * 100))
+print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean()
+                                            * 100))
 
 model_comparison["SLR Vs Ram"] = [
     r2_score(y_test, y_pred),
@@ -574,12 +580,14 @@ from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
-accuracies = cross_val_score(estimator=model, X=X_train, y=y_train, cv=5)
+accuracies = cross_val_score(estimator=model,
+                             X=X_train, y=y_train, cv=5)
 
 print(f"R2 Score : {r2_score(y_test,y_pred)*100:.2f}%")
 print(f"MAE : {mean_absolute_error(y_test,y_pred)*100:.2f}%")
 print(f"MSE : {mean_squared_error(y_test,y_pred)*100:.2f}%")
-print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean() * 100))
+print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean()
+                                            * 100))
 
 model_comparison["SLR Vs ppi"] = [
     r2_score(y_test, y_pred),
@@ -598,7 +606,8 @@ model_comparison["SLR Vs ppi"] = [
 X = df["Weight"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to fit an intercept
+# Add a constant term to the predictor variable to 
+# fit an intercept
 X = sm.add_constant(X)
 
 # Fit the linear regression model
@@ -618,12 +627,14 @@ from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
-accuracies = cross_val_score(estimator=model, X=X_train, y=y_train, cv=5)
+accuracies = cross_val_score(estimator=model,
+                             X=X_train, y=y_train, cv=5)
 
 print(f"R2 Score : {r2_score(y_test,y_pred)*100:.2f}%")
 print(f"MAE : {mean_absolute_error(y_test,y_pred)*100:.2f}%")
 print(f"MSE : {mean_squared_error(y_test,y_pred)*100:.2f}%")
-print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean() * 100))
+print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean()
+                                            * 100))
 
 model_comparison["SLR Vs Weight"] = [
     r2_score(y_test, y_pred),
@@ -642,7 +653,8 @@ model_comparison["SLR Vs Weight"] = [
 X = df["HDD"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to fit an intercept
+# Add a constant term to the predictor variable to fit 
+# an intercept
 X = sm.add_constant(X)
 
 # Fit the linear regression model
@@ -662,12 +674,14 @@ from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
-accuracies = cross_val_score(estimator=model, X=X_train, y=y_train, cv=5)
+accuracies = cross_val_score(estimator=model,
+                             X=X_train, y=y_train, cv=5)
 
 print(f"R2 Score : {r2_score(y_test,y_pred) * 100:.2f}%")
 print(f"MAE : {mean_absolute_error(y_test,y_pred) * 100:.2f}%")
 print(f"MSE : {mean_squared_error(y_test,y_pred) * 100:.2f}%")
-print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean() * 100))
+print("Cross Val Accuracy: {:.2f} %".format(accuracies.mean()
+                                            * 100))
 
 model_comparison["SLR Vs HDD"] = [
     r2_score(y_test, y_pred),
@@ -702,7 +716,8 @@ ct = ColumnTransformer(
     remainder="passthrough",
 )
 
-pipe = Pipeline(steps=[("preprocessor", ct), ("regressor", LinearRegression())])
+pipe = Pipeline(steps=[("preprocessor", ct), ("regressor",
+                                              LinearRegression())])
 
 pipe.fit(X_train, y_train)
 
@@ -711,7 +726,8 @@ y_pred = pipe.predict(X_test)
 r2 = r2_score(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
-accuracy = cross_val_score(estimator=pipe, X=X_train, y=y_train, cv=5).mean()
+accuracy = cross_val_score(estimator=pipe, X=X_train,
+                           y=y_train, cv=5).mean()
 
 print(f"R2 Score: {r2*100:.2f}%")
 print(f"MSE: {mse*100:.2f}%")
@@ -740,12 +756,15 @@ X_train
 
 ct = ColumnTransformer(
     transformers=[
-        ("onehot", OneHotEncoder(sparse=False, handle_unknown="ignore"), [0, 2, 7, 10])
+        ("onehot", OneHotEncoder(sparse=False,
+                                 handle_unknown="ignore"),
+         [0, 2, 7, 10])
     ],
     remainder="passthrough",
 )
 
-pipe = Pipeline(steps=[("preprocessor", ct), ("regressor", LinearRegression())])
+pipe = Pipeline(steps=[("preprocessor", ct),
+                       ("regressor", LinearRegression())])
 
 pipe.fit(X_train, y_train)
 
@@ -754,14 +773,16 @@ y_pred = pipe.predict(X_test)
 r2 = r2_score(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
-accuracy = cross_val_score(estimator=pipe, X=X_train, y=y_train, cv=5).mean()
+accuracy = cross_val_score(estimator=pipe,
+                           X=X_train, y=y_train, cv=5).mean()
 
 print(f"R2 Score: {r2*100:.2f}%")
 print(f"MSE: {mse*100:.2f}%")
 print(f"MAE: {mae*100:.2f}%")
 print(f"Cross Val Accuracy: {accuracy*100:.2f}%")
 
-model_comparison["MLR w/o Weight"] = [r2, mse, mae, accuracy]
+model_comparison["MLR w/o Weight"] = [r2, mse,
+                                      mae, accuracy]
 
 
 # #### Model 3: Except HDD
@@ -792,7 +813,8 @@ ct = ColumnTransformer(
     remainder="passthrough",
 )
 
-pipe = Pipeline(steps=[("preprocessor", ct), ("regressor", LinearRegression())])
+pipe = Pipeline(steps=[("preprocessor", ct), ("regressor",
+                                              LinearRegression())])
 
 pipe.fit(X_train, y_train)
 
@@ -801,14 +823,16 @@ y_pred = pipe.predict(X_test)
 r2 = r2_score(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
-accuracy = cross_val_score(estimator=pipe, X=X_train, y=y_train, cv=5).mean()
+accuracy = cross_val_score(estimator=pipe,
+                           X=X_train, y=y_train, cv=5).mean()
 
 print(f"R2 Score: {r2*100:.2f}%")
 print(f"MSE: {mse*100:.2f}%")
 print(f"MAE: {mae*100:.2f}%")
 print(f"Cross Val Accuracy: {accuracy*100:.2f}%")
 
-model_comparison["MLR w/o HDD"] = [r2, mse, mae, accuracy]
+model_comparison["MLR w/o HDD"] = [r2, mse,
+                                   mae, accuracy]
 
 
 # ###Summary on Model Building
@@ -853,14 +877,16 @@ ct = ColumnTransformer(
     transformers=[
         (
             "onehot",
-            OneHotEncoder(sparse=False, handle_unknown="ignore"),
+            OneHotEncoder(sparse=False,
+                          handle_unknown="ignore"),
             [0, 1, 3, 8, 11],
         )
     ],
     remainder="passthrough",
 )
 
-pipe = Pipeline(steps=[("preprocessor", ct), ("regressor", LinearRegression())])
+pipe = Pipeline(steps=[("preprocessor", ct), ("regressor",
+                                              LinearRegression())])
 
 pipe.fit(X_train, y_train)
 
@@ -869,11 +895,13 @@ print("Train R-squared:", pipe.score(X_train, y_train))
 print("Test R-squared:", pipe.score(X_test, y_test))
 n = X_train.shape[0]
 p = X_train.shape[1]
-train_adj_r2 = 1 - (1 - pipe.score(X_train, y_train)) * (n - 1) / (n - p - 1)
+train_adj_r2 = 1 - (1 - pipe.score(X_train, y_train)) * \
+    (n - 1) / (n - p - 1)
 print("Train Adjusted R-squared:", train_adj_r2)
 n = X_test.shape[0]
 p = X_test.shape[1]
-test_adj_r2 = 1 - (1 - pipe.score(X_test, y_test)) * (n - 1) / (n - p - 1)
+test_adj_r2 = 1 - (1 - pipe.score(X_test, y_test)) * \
+              (n - 1) / (n - p - 1)
 print("Test Adjusted R-squared:", test_adj_r2)
 
 # Performance comparison on Train and Test Samples
@@ -904,11 +932,6 @@ df.to_csv("df.csv", index=False)
 pickle.dump(pipe, open("pipe.pkl", "wb"))
 
 
-# In[113]:
-
-
-get_ipython().system("pip install jedi")
-get_ipython().system("pip install streamlit")
 
 
 # In[ ]:
