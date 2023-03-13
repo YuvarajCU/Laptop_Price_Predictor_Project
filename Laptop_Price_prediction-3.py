@@ -21,6 +21,7 @@ from sklearn.metrics \
     import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression
+import pickle
 
 
 path = "Dataset.csv"
@@ -312,9 +313,8 @@ sns.catplot(
 # In[41]:
 
 
-sns.catplot(x="TypeName", y="Price_euros", kind="bar", data=df).set_xticklabels(
-    rotation=90
-)
+sns.catplot(x="TypeName", y="Price_euros",
+            kind="bar", data=df).set_xticklabels(rotation=90)
 sns.catplot(x="OpSys", y="Price_euros", kind="bar", data=df).set_xticklabels(
     rotation=90
 )
@@ -419,7 +419,6 @@ print(vif)
 # In[91]:
 
 
-import statsmodels.api as sm
 
 X = df[["Ram", "Weight", "Price_euros", "Touchscreen", "Ips", "ppi",
         "SSD", "HDD"]]
@@ -513,7 +512,7 @@ model_comparison["SLR Vs Company"] = [
 X = df["Ram"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to fit 
+# Add a constant term to the predictor variable to fit
 # an intercept
 X = sm.add_constant(X)
 
@@ -529,9 +528,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 model = LinearRegression()
 model.fit(X_train, y_train)
-
-from sklearn.metrics import r2_score
-
 y_pred = model.predict(X_test)
 
 accuracies = cross_val_score(estimator=model, X=X_train,
@@ -576,8 +572,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-from sklearn.metrics import r2_score
-
 y_pred = model.predict(X_test)
 
 accuracies = cross_val_score(estimator=model,
@@ -606,7 +600,7 @@ model_comparison["SLR Vs ppi"] = [
 X = df["Weight"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to 
+# Add a constant term to the predictor variable to
 # fit an intercept
 X = sm.add_constant(X)
 
@@ -623,7 +617,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
@@ -653,7 +646,7 @@ model_comparison["SLR Vs Weight"] = [
 X = df["HDD"]
 y = df["Price_euros"]
 
-# Add a constant term to the predictor variable to fit 
+# Add a constant term to the predictor variable to fit
 # an intercept
 X = sm.add_constant(X)
 
@@ -670,7 +663,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-from sklearn.metrics import r2_score
 
 y_pred = model.predict(X_test)
 
@@ -922,16 +914,5 @@ plt.ylabel("Frequency")
 plt.title("Histogram of Residuals")
 plt.show()
 
-
-# In[112]:
-
-
-import pickle
-
 df.to_csv("df.csv", index=False)
 pickle.dump(pipe, open("pipe.pkl", "wb"))
-
-
-
-
-# In[ ]:
